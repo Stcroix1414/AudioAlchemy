@@ -1,6 +1,6 @@
 # AudioAlchemy - The Art of Voice Transformation
 
-A sophisticated Flask-based web application that provides professional-grade speech-to-text transcription, text translation, and text-to-speech synthesis with multiple AI provider support. AudioAlchemy combines cutting-edge AI technology with an elegant.
+A sophisticated Flask-based web application that provides professional-grade speech-to-text transcription, text translation, and text-to-speech synthesis with multiple AI provider support. AudioAlchemy combines cutting-edge AI technology with an elegant interface and easy to use design.
 
 ## Features
 

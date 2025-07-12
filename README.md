@@ -69,6 +69,8 @@ A sophisticated Flask-based web application that provides professional-grade spe
 ### Prerequisites
 - Python 3.8+
 - FFmpeg (for audio conversion)
+- Git LFS (for large file support)
+- Docker and Docker Compose (for local TTS services)
 - Virtual environment (recommended)
 
 ### Quick Start
@@ -79,7 +81,16 @@ git clone <repository-url>
 cd Speech2txt
 ```
 
-2. **Create and activate virtual environment:**
+2. **Set up local TTS datasets (for enhanced voice cloning):**
+```bash
+# Install Git LFS if not already installed
+git lfs install
+
+# Clone the CMU Arctic X-vectors dataset for voice embeddings
+git clone https://huggingface.co/datasets/Matthijs/cmu-arctic-xvectors cmu_arctic_embeddings
+```
+
+3. **Create and activate virtual environment:**
 ```bash
 python -m venv myvenv
 # Windows
@@ -88,24 +99,30 @@ myvenv\Scripts\activate
 source myvenv/bin/activate
 ```
 
-3. **Install dependencies:**
+4. **Install dependencies:**
 ```bash
 pip install -r requirements.txt
 ```
 
-4. **Install FFmpeg:**
+5. **Install FFmpeg:**
    - **Windows:** Download from [FFmpeg website](https://ffmpeg.org/download.html)
    - **Ubuntu/Debian:** `sudo apt install ffmpeg`
    - **macOS:** `brew install ffmpeg`
 
-5. **Configure environment variables (optional):**
+6. **Start local TTS services (optional but recommended):**
+```bash
+# Start all Docker services including local TTS
+docker-compose up -d
+```
+
+7. **Configure environment variables (optional):**
 ```bash
 # Create .env file for API keys
 echo "ELEVENLABS_API_KEY=your_elevenlabs_api_key_here" > .env
 echo "OPENAI_API_KEY=your_openai_api_key_here" >> .env
 ```
 
-6. **Run the application:**
+8. **Run the application:**
 ```bash
 python app.py
 ```
@@ -212,6 +229,10 @@ python app.py
 ### Services Included:
 - **Ollama**: Local LLM server (port 11434)
 - **OpenUI**: Web interface for AI models (port 7878)
+- **OpenAI Edge TTS**: Local text-to-speech service (port 5050)
+  - Provides OpenAI-compatible TTS API endpoint
+  - Reduces dependency on external TTS services
+  - Improves performance and privacy for local deployments
 
 ## Project Structure
 
@@ -225,6 +246,7 @@ AudioAlchemy/
 ├── .env                    # Environment variables (create this)
 ├── app.spec                # PyInstaller spec for app
 ├── MyVoiceApp.spec         # PyInstaller spec for voice app
+├── cmu_arctic_embeddings/  # CMU Arctic X-vectors dataset (cloned)
 ├── static/                 # Static web assets
 │   ├── ChatGPT.png
 │   └── style.css           # Professional styling with refined color palette

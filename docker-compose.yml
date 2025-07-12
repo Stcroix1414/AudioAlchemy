@@ -23,5 +23,12 @@ services:
     env_file:
       - .env
 
+  openai-edge-tts:
+    container_name: openai-edge-tts
+    image: travisvn/openai-edge-tts:latest
+    ports:
+      - "5050:5050"
+    restart: unless-stopped
+
 volumes:
   ollama:

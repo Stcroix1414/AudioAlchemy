@@ -1,6 +1,6 @@
-# Speech2Text - AI-Powered Speech Recognition & Text-to-Speech Application
+# AudioAlchemy - The Art of Voice Transformation
 
-A comprehensive Flask-based web application that provides speech-to-text transcription, text translation, and text-to-speech synthesis with multiple AI provider support.
+A sophisticated Flask-based web application that provides professional-grade speech-to-text transcription, text translation, and text-to-speech synthesis with multiple AI provider support. AudioAlchemy combines cutting-edge AI technology with an elegant.
 
 ## Features
 
@@ -25,6 +25,23 @@ A comprehensive Flask-based web application that provides speech-to-text transcr
 - Speed and quality controls
 - Voice stability and clarity settings
 
+### 🎭 Voice Cloning (NEW)
+- **Ethical Voice Cloning:**
+  - Create custom voice models from audio samples
+  - ElevenLabs API integration for high-quality cloning
+  - Consent-based system with ethical guidelines
+  - Voice sample validation and quality checks
+- **Voice Management:**
+  - Upload audio files or record directly in browser
+  - Voice library with preview and management tools
+  - Quota system to prevent abuse
+  - Secure voice data handling and retention policies
+- **Advanced Features:**
+  - Real-time voice preview with custom text
+  - Voice quality validation (minimum 10 seconds, 16kHz)
+  - Automatic audio format conversion
+  - Voice clone deletion and cleanup
+
 ### 👤 User Management
 - Personalized user preferences
 - Customizable voice settings
@@ -39,12 +56,13 @@ A comprehensive Flask-based web application that provides speech-to-text transcr
 - Downloadable results
 - Session management
 
-### 🎨 Modern UI
-- Responsive web design
-- Dark/light theme support
-- Real-time feedback
-- Progress indicators
-- Mobile-friendly interface
+### 🎨 Professional Interface
+- Sophisticated design
+- Refined color palette with muted steel blue accents
+- Professional typography using Inter/Source Sans Pro fonts
+- Clean, minimal visual effects for mature presentation
+- Responsive design optimized for business use
+- Consistent AudioAlchemy branding across all pages
 
 ## Installation
 
@@ -198,30 +216,41 @@ python app.py
 ## Project Structure
 
 ```
-Speech2txt/
-├── app.py                 # Main Flask application
-├── launcher.py           # Application launcher
-├── requirements.txt      # Python dependencies
-├── docker-compose.yml    # Docker services configuration
-├── .gitignore           # Git ignore rules
-├── .env                 # Environment variables (create this)
-├── app.spec             # PyInstaller spec for app
-├── MyVoiceApp.spec      # PyInstaller spec for voice app
-├── static/              # Static web assets
+AudioAlchemy/
+├── app.py                    # Main Flask application
+├── launcher.py              # Application launcher
+├── requirements.txt         # Python dependencies
+├── docker-compose.yml       # Docker services configuration
+├── .gitignore              # Git ignore rules
+├── .env                    # Environment variables (create this)
+├── app.spec                # PyInstaller spec for app
+├── MyVoiceApp.spec         # PyInstaller spec for voice app
+├── static/                 # Static web assets
 │   ├── ChatGPT.png
-│   └── style.css
-├── templates/           # HTML templates
-│   ├── enhanced_index.html
-│   ├── history.html
-│   ├── index.html
-│   ├── preferences.html
-│   ├── speech_to_text.html
-│   └── text_to_speech.html
-├── uploads/             # User uploaded files (ignored)
-├── backup/              # Backup files (ignored)
-├── build/               # Build artifacts (ignored)
-└── myvenv/              # Virtual environment (ignored)
+│   └── style.css           # Professional styling with refined color palette
+├── templates/              # HTML templates with AudioAlchemy branding
+│   ├── enhanced_index.html # Main interface with professional design
+│   ├── history.html        # Activity history with consistent navigation
+│   ├── index.html          # Legacy template
+│   ├── preferences.html    # User preferences with AudioAlchemy branding
+│   ├── speech_to_text.html # Speech-to-text interface
+│   ├── text_to_speech.html # Text-to-speech interface
+│   └── voice_cloning.html  # Voice cloning studio with professional styling
+├── uploads/                # User uploaded files (ignored)
+├── backup/                 # Backup files (ignored)
+├── build/                  # Build artifacts (ignored)
+└── myvenv/                 # Virtual environment (ignored)
 ```
+
+### Design Philosophy
+
+AudioAlchemy features a professionally refined interface that eliminates childish visual elements while maintaining functionality:
+
+- **Color Palette**: Sophisticated muted steel blue (#5a67d8) with professional gray accents
+- **Typography**: Clean Inter/Source Sans Pro fonts for enhanced readability
+- **Visual Effects**: Minimal, enterprise-appropriate styling without excessive animations
+- **Branding**: Consistent AudioAlchemy identity with flask iconography across all pages
+- **Navigation**: Unified navigation structure with proper active states
 
 ## Building Executable
 

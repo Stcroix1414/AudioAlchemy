@@ -1,13 +1,10 @@
 body {
-    font-family: 'Arial', sans-serif;
-    background-color: #1a1a2e; /* Dark space-like background */
-    color: #fff;
+    font-family: 'Inter', 'Source Sans Pro', 'Roboto', system-ui, sans-serif;
+    background-color: #2d3748;
+    color: #f7fafc;
     margin: 0;
     padding: 0;
-    background: linear-gradient(to bottom, #1a1a2e, #16213e); /* Gradient background for a cosmic feel */
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
+    min-height: 100vh;
     overflow-x: hidden;
 }
 
@@ -15,24 +12,23 @@ body {
     max-width: 800px;
     margin: 30px auto;
     padding: 20px;
-    background-color: rgba(255, 255, 255, 0.1); /* Slight transparent background for space effect */
-    border-radius: 12px;
-    box-shadow: 0 0 30px rgba(255, 255, 255, 0.2); /* Glowing effect for a space look */
-    backdrop-filter: blur(10px); /* Add a blur effect for space theme */
+    background-color: #2d3748;
+    border-radius: 4px;
+    border: 1px solid #718096;
 }
 
 h1, h2, h3 {
     text-align: center;
-    color: #fff;
-    text-shadow: 0px 0px 10px rgba(255, 255, 255, 0.8), 0px 0px 20px rgba(255, 255, 255, 0.6);
+    color: #f7fafc;
+    font-weight: 600;
 }
 
 .form-section {
     margin: 30px 0;
     padding: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.3); /* Slight glowing border */
-    border-radius: 8px;
-    background-color: rgba(24, 29, 45, 0.6); /* Dark background for form sections */
+    border: 1px solid #718096;
+    border-radius: 4px;
+    background-color: #4a5568;
 }
 
 input[type="file"],
@@ -42,47 +38,46 @@ select {
     width: 100%;
     padding: 12px;
     margin: 8px 0 15px;
-    border-radius: 6px;
-    border: 1px solid #3f8efc; /* Space blue border */
+    border-radius: 4px;
+    border: 1px solid #718096;
     font-size: 16px;
-    background-color: rgba(255, 255, 255, 0.2); /* Slightly transparent input */
-    color: #fff;
+    background-color: #4a5568;
+    color: #f7fafc;
 }
 
 input[type="file"]:focus,
 input[type="text"]:focus,
 textarea:focus,
 select:focus {
-    border-color: #266fd9; /* Focused input will have brighter blue */
+    border-color: #5a67d8;
     outline: none;
-    box-shadow: 0 0 8px rgba(38, 111, 217, 0.8);
+    box-shadow: none;
 }
 
 button {
-    background-color: #3f8efc;
+    background-color: #5a67d8;
     color: white;
     padding: 12px 24px;
-    border: none;
-    border-radius: 6px;
+    border: 1px solid #5a67d8;
+    border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
-    text-transform: uppercase;
-    box-shadow: 0px 0px 15px rgba(63, 142, 252, 0.6); /* Glow effect on button */
+    font-weight: 500;
 }
 
 button:hover {
-    background-color: #266fd9;
-    box-shadow: 0px 0px 25px rgba(38, 111, 217, 0.9); /* Stronger glow on hover */
+    background-color: #4c51bf;
+    border-color: #4c51bf;
+    opacity: 0.9;
 }
 
 .output {
     margin-top: 25px;
     padding: 15px;
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    color: #fff;
-    backdrop-filter: blur(8px);
-    box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
+    background-color: #4a5568;
+    border: 1px solid #718096;
+    border-radius: 4px;
+    color: #f7fafc;
 }
 
 audio {
@@ -97,36 +92,39 @@ audio {
 
 .flashes li {
     padding: 10px;
-    border-radius: 6px;
+    border-radius: 4px;
     margin-bottom: 10px;
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    border: 1px solid #718096;
 }
 
 .flash-danger {
-    background-color: rgba(248, 215, 218, 0.8); /* Soft red for errors */
-    color: #721c24;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+    background-color: #4a5568;
+    border-color: #e53e3e;
+    color: #f7fafc;
 }
 
 .nav-tabs {
-    border-bottom: 2px solid #3f8efc; /* Blue tab separator */
+    border-bottom: 1px solid #718096;
 }
 
 .nav-tabs .nav-item .nav-link {
-    color: #fff;
-    background-color: #16213e;
-    border-radius: 8px 8px 0 0;
+    color: #f7fafc;
+    background-color: #4a5568;
+    border: 1px solid #718096;
+    border-radius: 4px 4px 0 0;
     padding: 12px;
+    margin-right: 2px;
 }
 
 .nav-tabs .nav-item .nav-link.active {
-    color: #fff;
-    background-color: #3f8efc;
-    box-shadow: 0px 4px 8px rgba(63, 142, 252, 0.6);
+    color: white;
+    background-color: #5a67d8;
+    border-color: #5a67d8;
 }
 
 .nav-tabs .nav-item .nav-link:hover {
-    background-color: #266fd9;
+    background-color: #4c51bf;
+    border-color: #4c51bf;
 }
 
 .tab-content {

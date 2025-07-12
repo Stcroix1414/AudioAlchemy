@@ -184,3 +184,5 @@ docker-compose.override.yml
 logs/
 *.log
 dist.zip
+voice_cloning_strategy.md
+user_data.json

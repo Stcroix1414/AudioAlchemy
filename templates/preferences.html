@@ -8,29 +8,29 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #3f8efc;
-            --secondary-color: #266fd9;
-            --background-dark: #1a1a2e;
-            --background-light: #16213e;
-            --text-light: #fff;
-            --success-color: #28a745;
-            --danger-color: #dc3545;
+            --primary-color: #5a67d8;
+            --secondary-color: #4c51bf;
+            --background-dark: #2d3748;
+            --background-light: #4a5568;
+            --text-light: #f7fafc;
+            --success-color: #38a169;
+            --danger-color: #e53e3e;
+            --border-color: #718096;
+            --card-background: #2d3748;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, var(--background-dark), var(--background-light));
+            font-family: 'Inter', 'Source Sans Pro', 'Roboto', system-ui, sans-serif;
+            background: var(--background-dark);
             color: var(--text-light);
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            background-attachment: fixed;
         }
 
         .navbar {
-            background: rgba(26, 26, 46, 0.95) !important;
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(63, 142, 252, 0.3);
+            background: var(--background-light) !important;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .navbar-brand {
@@ -55,50 +55,51 @@
         }
 
         .card {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
             margin-bottom: 20px;
         }
 
         .card-header {
-            background: rgba(63, 142, 252, 0.2);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 15px 15px 0 0 !important;
+            background: var(--background-light);
+            border-bottom: 1px solid var(--border-color);
+            border-radius: 4px 4px 0 0 !important;
         }
 
         .form-control, .form-control:focus {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: var(--background-light);
+            border: 1px solid var(--border-color);
             color: var(--text-light);
-            border-radius: 8px;
+            border-radius: 4px;
         }
 
         .form-control:focus {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.2rem rgba(63, 142, 252, 0.25);
+            box-shadow: none;
+            outline: none;
         }
 
         .btn-primary {
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-            border: none;
-            border-radius: 8px;
+            background: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            border-radius: 4px;
             padding: 10px 20px;
             font-weight: 500;
-            transition: all 0.3s ease;
+            color: white;
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(63, 142, 252, 0.4);
+            background: var(--secondary-color);
+            border-color: var(--secondary-color);
+            opacity: 0.9;
         }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: var(--background-light);
+            border: 1px solid var(--border-color);
             color: var(--text-light);
-            border-radius: 8px;
+            border-radius: 4px;
         }
 
         .range-slider {
@@ -194,7 +195,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="/">
-                <i class="fas fa-microphone-alt"></i> Enhanced Voice AI
+                <i class="fas fa-flask"></i> AudioAlchemy
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -209,6 +210,9 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/history"><i class="fas fa-history"></i> History</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/voice-cloning"><i class="fas fa-clone"></i> Voice Cloning</a>
                     </li>
                 </ul>
             </div>
@@ -375,6 +379,58 @@
                                placeholder="e.g., en, es, fr, de">
                         <small class="form-text text-muted">Default language for transcription and translation</small>
                     </div>
+                </div>
+            </div>
+
+            <!-- Voice Cloning Settings -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-clone"></i> Voice Cloning Settings</h5>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="voice_cloning_provider"><i class="fas fa-server"></i> Voice Cloning Provider</label>
+                        <select name="voice_cloning_provider" class="form-control">
+                            <option value="auto" {{ 'selected' if user_data.get('voice_cloning_provider', 'auto') == 'auto' else '' }}>Auto (ElevenLabs → Local fallback)</option>
+                            <option value="elevenlabs" {{ 'selected' if user_data.get('voice_cloning_provider') == 'elevenlabs' else '' }}>ElevenLabs Only</option>
+                            <option value="local" {{ 'selected' if user_data.get('voice_cloning_provider') == 'local' else '' }}>Local Models Only</option>
+                        </select>
+                        <small class="form-text text-muted">
+                            Auto: Try ElevenLabs first, fallback to local models<br>
+                            ElevenLabs: High-quality cloud-based voice cloning (requires API key)<br>
+                            Local: Privacy-focused local voice cloning (no internet required)
+                        </small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="voice_cloning_quota"><i class="fas fa-limit"></i> Voice Cloning Quota</label>
+                        <input type="number" name="voice_cloning_quota" class="form-control" 
+                               value="{{ user_data.get('voice_cloning_quota', 5) }}" min="1" max="20">
+                        <small class="form-text text-muted">Maximum number of voice clones you can create</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="voice_data_retention_days"><i class="fas fa-calendar-times"></i> Voice Data Retention (Days)</label>
+                        <input type="number" name="voice_data_retention_days" class="form-control" 
+                               value="{{ user_data.get('voice_data_retention_days', 30) }}" min="1" max="365">
+                        <small class="form-text text-muted">How long to keep voice training data (for privacy)</small>
+                    </div>
+                    
+                    {% if user_data.get('voice_cloning_consent') %}
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i> Voice cloning is enabled
+                            <a href="/voice-cloning" class="btn btn-sm btn-outline-light ml-2">
+                                <i class="fas fa-clone"></i> Manage Voice Clones
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i> Voice cloning requires consent
+                            <a href="/voice-cloning" class="btn btn-sm btn-warning ml-2">
+                                <i class="fas fa-shield-alt"></i> Review & Enable
+                            </a>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
 

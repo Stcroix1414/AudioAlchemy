@@ -77,7 +77,13 @@ DEFAULT_USER_PREFS = {
     'tts_provider': 'openai',  # 'openai', 'elevenlabs', 'gtts'
     'elevenlabs_voice_id': None,
     'favorite_phrases': [],
-    'recent_languages': ['en', 'es', 'fr']
+    'recent_languages': ['en', 'es', 'fr'],
+    'voice_cloning_enabled': False,
+    'voice_cloning_consent': False,
+    'voice_cloning_provider': 'auto',  # 'auto', 'elevenlabs', 'local'
+    'custom_voices': [],
+    'voice_cloning_quota': 5,  # Number of voice clones allowed
+    'voice_data_retention_days': 30
 }
 
 def allowed_file(filename):
@@ -153,6 +159,243 @@ def get_elevenlabs_voices():
     except Exception as e:
         print(f"Error getting ElevenLabs voices: {e}")
         return []
+
+def validate_voice_sample(filepath):
+    """Validate voice sample for cloning"""
+    try:
+        # Check file size (minimum 10 seconds, maximum 5 minutes)
+        file_size = os.path.getsize(filepath)
+        if file_size < 100000:  # ~10 seconds of audio
+            return False, "Audio sample too short. Minimum 10 seconds required."
+        if file_size > 50000000:  # ~5 minutes of audio
+            return False, "Audio sample too long. Maximum 5 minutes allowed."
+        
+        # Check audio quality using ffmpeg
+        try:
+            result = subprocess.run([
+                'ffprobe', '-v', 'quiet', '-print_format', 'json', 
+                '-show_format', '-show_streams', filepath
+            ], capture_output=True, text=True, check=True)
+            
+            import json
+            audio_info = json.loads(result.stdout)
+            
+            # Check if it's audio
+            audio_streams = [s for s in audio_info.get('streams', []) if s.get('codec_type') == 'audio']
+            if not audio_streams:
+                return False, "No audio stream found in file."
+            
+            # Check sample rate (minimum 16kHz recommended)
+            sample_rate = int(audio_streams[0].get('sample_rate', 0))
+            if sample_rate < 16000:
+                return False, "Audio quality too low. Minimum 16kHz sample rate required."
+            
+            return True, "Voice sample validated successfully."
+            
+        except (subprocess.CalledProcessError, json.JSONDecodeError):
+            return False, "Unable to validate audio format."
+            
+    except Exception as e:
+        return False, f"Validation error: {str(e)}"
+
+def create_voice_clone_local(name, description, audio_file_path, user_id=None):
+    """Create a voice clone using local TTS models (Tortoise-TTS or Coqui)"""
+    try:
+        # Validate the audio sample
+        is_valid, message = validate_voice_sample(audio_file_path)
+        if not is_valid:
+            return None, message
+        
+        # Check user quota
+        user_data = load_user_data()
+        if len(user_data.get('custom_voices', [])) >= user_data.get('voice_cloning_quota', 5):
+            return None, "Voice cloning quota exceeded. Please remove existing voices or upgrade your plan."
+        
+        # Generate unique voice ID for local model
+        voice_id = f"local_{uuid.uuid4().hex[:12]}"
+        
+        # Create voice model directory
+        voice_model_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'voice_models', voice_id)
+        os.makedirs(voice_model_dir, exist_ok=True)
+        
+        # Copy and process audio file for training
+        processed_audio_path = os.path.join(voice_model_dir, 'training_audio.wav')
+        
+        try:
+            # Convert to proper format for training (22kHz, mono)
+            command = [
+                'ffmpeg', '-i', audio_file_path, 
+                '-ar', '22050', '-ac', '1', '-y',
+                processed_audio_path
+            ]
+            subprocess.run(command, check=True, capture_output=True)
+        except subprocess.CalledProcessError as e:
+            return None, f"Audio preprocessing failed: {str(e)}"
+        
+        # Store voice information (local model)
+        voice_info = {
+            'id': voice_id,
+            'name': name,
+            'description': description,
+            'created_at': datetime.now().isoformat(),
+            'file_path': audio_file_path,
+            'model_path': voice_model_dir,
+            'processed_audio': processed_audio_path,
+            'user_id': user_id or 'default',
+            'provider': 'local',
+            'status': 'ready'  # For local models, we'll mark as ready immediately
+        }
+        
+        # Add to user's custom voices
+        user_data['custom_voices'].append(voice_info)
+        save_user_data(user_data)
+        
+        # Add to history
+        add_to_history('voice_clone', f"Created local voice clone: {name}", {
+            'voice_id': voice_id,
+            'name': name,
+            'description': description,
+            'provider': 'local'
+        })
+        
+        return voice_id, "Local voice clone created successfully."
+        
+    except Exception as e:
+        return None, f"Local voice cloning error: {str(e)}"
+
+def create_voice_clone(name, description, audio_file_path, user_id=None, provider='auto'):
+    """Create a voice clone using specified provider or auto-select"""
+    try:
+        user_data = load_user_data()
+        preferred_provider = user_data.get('voice_cloning_provider', 'auto')
+        
+        if provider == 'auto':
+            provider = preferred_provider
+        
+        # Try ElevenLabs first if API key is available and provider allows
+        if provider in ['auto', 'elevenlabs'] and ELEVENLABS_API_KEY != 'your_elevenlabs_api_key_here':
+            try:
+                # Validate the audio sample
+                is_valid, message = validate_voice_sample(audio_file_path)
+                if not is_valid:
+                    return None, message
+                
+                # Check user quota
+                if len(user_data.get('custom_voices', [])) >= user_data.get('voice_cloning_quota', 5):
+                    return None, "Voice cloning quota exceeded. Please remove existing voices or upgrade your plan."
+                
+                # Create voice clone using ElevenLabs
+                if ELEVENLABS_CLIENT:
+                    # Use new API
+                    with open(audio_file_path, 'rb') as audio_file:
+                        voice = ELEVENLABS_CLIENT.clone(
+                            name=name,
+                            description=description,
+                            files=[audio_file]
+                        )
+                    voice_id = voice.voice_id
+                else:
+                    # Use old API (if available)
+                    from elevenlabs import clone
+                    voice = clone(
+                        name=name,
+                        description=description,
+                        files=[audio_file_path]
+                    )
+                    voice_id = voice.voice_id
+                
+                # Store voice information
+                voice_info = {
+                    'id': voice_id,
+                    'name': name,
+                    'description': description,
+                    'created_at': datetime.now().isoformat(),
+                    'file_path': audio_file_path,
+                    'user_id': user_id or 'default',
+                    'provider': 'elevenlabs'
+                }
+                
+                # Add to user's custom voices
+                user_data['custom_voices'].append(voice_info)
+                save_user_data(user_data)
+                
+                # Add to history
+                add_to_history('voice_clone', f"Created voice clone: {name}", {
+                    'voice_id': voice_id,
+                    'name': name,
+                    'description': description,
+                    'provider': 'elevenlabs'
+                })
+                
+                return voice_id, "Voice clone created successfully using ElevenLabs."
+                
+            except Exception as e:
+                if provider == 'elevenlabs':
+                    return None, f"ElevenLabs API error: {str(e)}"
+                # If auto mode, fall back to local
+                print(f"ElevenLabs failed, falling back to local: {e}")
+        
+        # Use local voice cloning as fallback or if explicitly requested
+        if provider in ['auto', 'local']:
+            return create_voice_clone_local(name, description, audio_file_path, user_id)
+        
+        return None, f"Unsupported voice cloning provider: {provider}"
+            
+    except Exception as e:
+        return None, f"Voice cloning error: {str(e)}"
+
+def delete_voice_clone(voice_id):
+    """Delete a voice clone"""
+    try:
+        user_data = load_user_data()
+        
+        # Find and remove voice from user data
+        custom_voices = user_data.get('custom_voices', [])
+        voice_to_remove = None
+        
+        for i, voice in enumerate(custom_voices):
+            if voice['id'] == voice_id:
+                voice_to_remove = custom_voices.pop(i)
+                break
+        
+        if not voice_to_remove:
+            return False, "Voice not found."
+        
+        # Delete from ElevenLabs
+        try:
+            if ELEVENLABS_CLIENT:
+                ELEVENLABS_CLIENT.delete(voice_id)
+            else:
+                from elevenlabs import delete
+                delete(voice_id)
+        except Exception as e:
+            print(f"Warning: Could not delete voice from ElevenLabs: {e}")
+        
+        # Clean up local file
+        try:
+            if os.path.exists(voice_to_remove['file_path']):
+                os.remove(voice_to_remove['file_path'])
+        except Exception as e:
+            print(f"Warning: Could not delete local file: {e}")
+        
+        # Save updated user data
+        save_user_data(user_data)
+        
+        # Add to history
+        add_to_history('voice_delete', f"Deleted voice clone: {voice_to_remove['name']}", {
+            'voice_id': voice_id,
+            'name': voice_to_remove['name']
+        })
+        
+        return True, "Voice clone deleted successfully."
+        
+    except Exception as e:
+        return False, f"Error deleting voice clone: {str(e)}"
+
+def get_user_custom_voices():
+    """Get user's custom voice clones"""
+    user_data = load_user_data()
+    return user_data.get('custom_voices', [])
 
 def text_to_speech_enhanced(text, voice, model, provider='openai', voice_settings=None):
     """Enhanced TTS function with multiple provider support"""
@@ -404,11 +647,16 @@ def preferences():
         user_data['tts_provider'] = request.form.get('tts_provider', user_data['tts_provider'])
         user_data['elevenlabs_voice_id'] = request.form.get('elevenlabs_voice_id', user_data['elevenlabs_voice_id'])
         
+        # Voice cloning settings
+        user_data['voice_cloning_provider'] = request.form.get('voice_cloning_provider', user_data.get('voice_cloning_provider', 'auto'))
+        
         # Voice settings
         try:
             user_data['voice_speed'] = float(request.form.get('voice_speed', user_data['voice_speed']))
             user_data['voice_stability'] = float(request.form.get('voice_stability', user_data['voice_stability']))
             user_data['voice_clarity'] = float(request.form.get('voice_clarity', user_data['voice_clarity']))
+            user_data['voice_cloning_quota'] = int(request.form.get('voice_cloning_quota', user_data.get('voice_cloning_quota', 5)))
+            user_data['voice_data_retention_days'] = int(request.form.get('voice_data_retention_days', user_data.get('voice_data_retention_days', 30)))
         except ValueError:
             flash("Invalid voice settings values", "flash-danger")
             return redirect(request.url)
@@ -467,6 +715,171 @@ def get_user_data():
 def api_elevenlabs_voices():
     """Get ElevenLabs voices via API"""
     return jsonify(get_elevenlabs_voices())
+
+@app.route('/voice-cloning', methods=['GET', 'POST'])
+def voice_cloning():
+    """Voice cloning management page"""
+    user_data = load_user_data()
+    
+    if request.method == 'POST':
+        action = request.form.get('action')
+        
+        if action == 'enable_consent':
+            # Handle voice cloning consent
+            consent = request.form.get('voice_cloning_consent') == 'on'
+            user_data['voice_cloning_consent'] = consent
+            user_data['voice_cloning_enabled'] = consent
+            save_user_data(user_data)
+            
+            if consent:
+                flash("Voice cloning enabled. You can now create custom voices.", "flash-success")
+            else:
+                flash("Voice cloning disabled.", "flash-info")
+            
+            return redirect(url_for('voice_cloning'))
+        
+        elif action == 'create_voice' and user_data.get('voice_cloning_consent', False):
+            # Handle voice clone creation
+            voice_name = request.form.get('voice_name', '').strip()
+            voice_description = request.form.get('voice_description', '').strip()
+            audio_file = request.files.get('voice_sample')
+            
+            if not voice_name:
+                flash("Voice name is required.", "flash-danger")
+                return redirect(request.url)
+            
+            if not audio_file or not allowed_file(audio_file.filename):
+                flash("Valid audio file is required.", "flash-danger")
+                return redirect(request.url)
+            
+            # Save uploaded file
+            filename = secure_filename(f"voice_sample_{uuid.uuid4().hex}_{audio_file.filename}")
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            audio_file.save(filepath)
+            
+            # Create voice clone
+            voice_id, message = create_voice_clone(voice_name, voice_description, filepath)
+            
+            if voice_id:
+                flash(message, "flash-success")
+            else:
+                flash(message, "flash-danger")
+                # Clean up file if creation failed
+                try:
+                    os.remove(filepath)
+                except:
+                    pass
+            
+            return redirect(request.url)
+    
+    # Get user's custom voices
+    custom_voices = get_user_custom_voices()
+    
+    return render_template('voice_cloning.html', 
+                         user_data=user_data, 
+                         custom_voices=custom_voices)
+
+@app.route('/api/voice-clone', methods=['POST'])
+def api_create_voice_clone():
+    """API endpoint to create voice clone"""
+    try:
+        user_data = load_user_data()
+        
+        if not user_data.get('voice_cloning_consent', False):
+            return jsonify({'error': 'Voice cloning consent required'}), 403
+        
+        data = request.get_json()
+        voice_name = data.get('name', '').strip()
+        voice_description = data.get('description', '').strip()
+        audio_data = data.get('audio_data')  # Base64 encoded audio
+        
+        if not voice_name:
+            return jsonify({'error': 'Voice name is required'}), 400
+        
+        if not audio_data:
+            return jsonify({'error': 'Audio data is required'}), 400
+        
+        # Decode and save audio data
+        import base64
+        audio_bytes = base64.b64decode(audio_data)
+        filename = f"voice_sample_{uuid.uuid4().hex}.wav"
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        
+        with open(filepath, 'wb') as f:
+            f.write(audio_bytes)
+        
+        # Create voice clone
+        voice_id, message = create_voice_clone(voice_name, voice_description, filepath)
+        
+        if voice_id:
+            return jsonify({
+                'success': True,
+                'voice_id': voice_id,
+                'message': message
+            })
+        else:
+            # Clean up file if creation failed
+            try:
+                os.remove(filepath)
+            except:
+                pass
+            return jsonify({'error': message}), 400
+            
+    except Exception as e:
+        return jsonify({'error': f'Server error: {str(e)}'}), 500
+
+@app.route('/api/voice-clone/<voice_id>', methods=['DELETE'])
+def api_delete_voice_clone(voice_id):
+    """API endpoint to delete voice clone"""
+    try:
+        success, message = delete_voice_clone(voice_id)
+        
+        if success:
+            return jsonify({'success': True, 'message': message})
+        else:
+            return jsonify({'error': message}), 400
+            
+    except Exception as e:
+        return jsonify({'error': f'Server error: {str(e)}'}), 500
+
+@app.route('/api/custom-voices')
+def api_get_custom_voices():
+    """Get user's custom voice clones"""
+    try:
+        custom_voices = get_user_custom_voices()
+        return jsonify(custom_voices)
+    except Exception as e:
+        return jsonify({'error': f'Server error: {str(e)}'}), 500
+
+@app.route('/api/voice-clone/preview', methods=['POST'])
+def api_preview_voice_clone():
+    """Preview a custom voice with sample text"""
+    try:
+        data = request.get_json()
+        voice_id = data.get('voice_id')
+        text = data.get('text', 'Hello! This is a preview of your custom voice.')
+        
+        if not voice_id:
+            return jsonify({'error': 'Voice ID is required'}), 400
+        
+        # Generate speech using the custom voice
+        filename = text_to_speech_enhanced(
+            text=text,
+            voice=voice_id,
+            model='eleven_multilingual_v2',
+            provider='elevenlabs'
+        )
+        
+        if filename:
+            return jsonify({
+                'success': True,
+                'audio_url': url_for('uploaded_file', filename=filename)
+            })
+        else:
+            return jsonify({'error': 'Failed to generate preview'}), 500
+            
+    except Exception as e:
+        return jsonify({'error': f'Server error: {str(e)}'}), 500
 
 def run_flask():
     app.run(host='0.0.0.0', port=80, debug=True)

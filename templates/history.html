@@ -8,29 +8,29 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #3f8efc;
-            --secondary-color: #266fd9;
-            --background-dark: #1a1a2e;
-            --background-light: #16213e;
-            --text-light: #fff;
-            --success-color: #28a745;
-            --danger-color: #dc3545;
+            --primary-color: #5a67d8;
+            --secondary-color: #4c51bf;
+            --background-dark: #2d3748;
+            --background-light: #4a5568;
+            --text-light: #f7fafc;
+            --success-color: #38a169;
+            --danger-color: #e53e3e;
+            --border-color: #718096;
+            --card-background: #2d3748;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, var(--background-dark), var(--background-light));
+            font-family: 'Inter', 'Source Sans Pro', 'Roboto', system-ui, sans-serif;
+            background: var(--background-dark);
             color: var(--text-light);
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            background-attachment: fixed;
         }
 
         .navbar {
-            background: rgba(26, 26, 46, 0.95) !important;
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(63, 142, 252, 0.3);
+            background: var(--background-light) !important;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .navbar-brand {
@@ -55,18 +55,11 @@
         }
 
         .history-item {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
             margin-bottom: 20px;
             padding: 20px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .history-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(63, 142, 252, 0.2);
         }
 
         .history-header {
@@ -75,7 +68,7 @@
             align-items: center;
             margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            border-bottom: 1px solid var(--border-color);
         }
 
         .history-type {
@@ -114,11 +107,12 @@
         }
 
         .history-metadata {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
+            background: var(--background-light);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
             padding: 10px;
             font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.8);
+            color: var(--text-light);
         }
 
         .history-actions {
@@ -130,38 +124,41 @@
         .btn-sm {
             padding: 5px 10px;
             font-size: 0.8rem;
-            border-radius: 6px;
+            border-radius: 4px;
         }
 
         .btn-outline-light {
-            border-color: rgba(255, 255, 255, 0.3);
+            border: 1px solid var(--border-color);
             color: var(--text-light);
+            background: transparent;
         }
 
         .btn-outline-light:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--background-light);
             border-color: var(--primary-color);
+            color: var(--text-light);
         }
 
         .filter-section {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
             padding: 20px;
             margin-bottom: 30px;
-            backdrop-filter: blur(10px);
         }
 
         .form-control {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: var(--background-light);
+            border: 1px solid var(--border-color);
             color: var(--text-light);
-            border-radius: 8px;
+            border-radius: 4px;
         }
 
         .form-control:focus {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.2rem rgba(63, 142, 252, 0.25);
-            background: rgba(255, 255, 255, 0.1);
+            box-shadow: none;
+            outline: none;
+            background: var(--background-light);
             color: var(--text-light);
         }
 
@@ -200,7 +197,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="/">
-                <i class="fas fa-microphone-alt"></i> Enhanced Voice AI
+                <i class="fas fa-flask"></i> AudioAlchemy
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -215,6 +212,9 @@
                     </li>
                     <li class="nav-item active">
                         <a class="nav-link" href="/history"><i class="fas fa-history"></i> History</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/voice-cloning"><i class="fas fa-clone"></i> Voice Cloning</a>
                     </li>
                 </ul>
             </div>

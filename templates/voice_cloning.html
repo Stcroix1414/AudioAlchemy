@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Cloning - Enhanced Voice AI</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #5a67d8;
+            --secondary-color: #4c51bf;
+            --background-dark: #2d3748;
+            --background-light: #4a5568;
+            --text-light: #f7fafc;
+            --success-color: #38a169;
+            --danger-color: #e53e3e;
+            --warning-color: #d69e2e;
+            --border-color: #718096;
+            --card-background: #2d3748;
+        }
+
+        body {
+            font-family: 'Inter', 'Source Sans Pro', 'Roboto', system-ui, sans-serif;
+            background: var(--background-dark);
+            color: var(--text-light);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: var(--background-light) !important;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .navbar-brand {
+            color: var(--primary-color) !important;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--text-light) !important;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+
+        .container-main {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            background: var(--background-light);
+            border-bottom: 1px solid var(--border-color);
+            border-radius: 4px 4px 0 0 !important;
+        }
+
+        .form-control, .form-control:focus {
+            background: var(--background-light);
+            border: 1px solid var(--border-color);
+            color: var(--text-light);
+            border-radius: 4px;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: none;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            border-radius: 4px;
+            padding: 10px 20px;
+            font-weight: 500;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary-color);
+            border-color: var(--secondary-color);
+            opacity: 0.9;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            border: 1px solid var(--success-color);
+            border-radius: 4px;
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            border: 1px solid var(--danger-color);
+            border-radius: 4px;
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            border: 1px solid var(--warning-color);
+            border-radius: 4px;
+            color: white;
+        }
+
+        .btn-outline-light {
+            border: 1px solid var(--border-color);
+            color: var(--text-light);
+            background: transparent;
+        }
+
+        .btn-outline-light:hover {
+            background: var(--background-light);
+            border-color: var(--primary-color);
+            color: var(--text-light);
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+
+        .alert-success {
+            background: rgba(40, 167, 69, 0.2);
+            color: #d4edda;
+        }
+
+        .alert-danger {
+            background: rgba(220, 53, 69, 0.2);
+            color: #f8d7da;
+        }
+
+        .alert-warning {
+            background: rgba(255, 193, 7, 0.2);
+            color: #fff3cd;
+        }
+
+        .alert-info {
+            background: rgba(23, 162, 184, 0.2);
+            color: #d1ecf1;
+        }
+
+        .consent-section {
+            background: rgba(255, 193, 7, 0.1);
+            border: 2px solid rgba(255, 193, 7, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .voice-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            transition: all 0.3s ease;
+        }
+
+        .voice-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        .voice-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .recording-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .record-button {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(45deg, var(--danger-color), #e74c3c);
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 20px;
+        }
+
+        .record-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 20px rgba(220, 53, 69, 0.4);
+        }
+
+        .record-button.recording {
+            background: linear-gradient(45deg, var(--success-color), #20c997);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .audio-preview {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .quota-info {
+            background: rgba(23, 162, 184, 0.1);
+            border: 1px solid rgba(23, 162, 184, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .ethical-notice {
+            background: rgba(138, 43, 226, 0.1);
+            border: 2px solid rgba(138, 43, 226, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            background: var(--primary-color);
+        }
+
+        .file-drop-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .file-drop-zone:hover {
+            border-color: var(--primary-color);
+            background: rgba(63, 142, 252, 0.1);
+        }
+
+        .file-drop-zone.dragover {
+            border-color: var(--success-color);
+            background: rgba(40, 167, 69, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .container-main {
+                margin: 15px;
+                padding: 15px;
+            }
+            
+            .voice-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-flask"></i> AudioAlchemy
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="fas fa-home"></i> Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/preferences"><i class="fas fa-cog"></i> Preferences</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/history"><i class="fas fa-history"></i> History</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/voice-cloning"><i class="fas fa-clone"></i> Voice Cloning</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-main">
+        <h1 class="text-center mb-4">
+            <i class="fas fa-clone"></i> Voice Cloning Studio
+        </h1>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if 'danger' in category else 'success' if 'success' in category else 'info' }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Ethical Notice -->
+        <div class="ethical-notice">
+            <h5><i class="fas fa-shield-alt"></i> Ethical Voice Cloning Guidelines</h5>
+            <p class="mb-2">
+                <strong>Important:</strong> Voice cloning technology must be used responsibly and ethically. By using this feature, you agree to:
+            </p>
+            <ul class="mb-0">
+                <li>Only clone voices with explicit consent from the voice owner</li>
+                <li>Not use cloned voices for deceptive, fraudulent, or harmful purposes</li>
+                <li>Clearly disclose when synthetic voices are used in content</li>
+                <li>Respect privacy and intellectual property rights</li>
+                <li>Comply with all applicable laws and regulations</li>
+            </ul>
+        </div>
+
+        {% if not user_data.voice_cloning_consent %}
+            <!-- Consent Section -->
+            <div class="consent-section">
+                <h4><i class="fas fa-exclamation-triangle"></i> Voice Cloning Consent Required</h4>
+                <p>
+                    Before you can create custom voice clones, you must read and agree to our ethical guidelines 
+                    and terms of use. Voice cloning is a powerful technology that must be used responsibly.
+                </p>
+                
+                <form method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <input type="hidden" name="action" value="enable_consent">
+                    <div class="form-check mb-3">
+                        <input type="checkbox" name="voice_cloning_consent" class="form-check-input" id="consentCheck" required>
+                        <label class="form-check-label" for="consentCheck">
+                            I have read and agree to the ethical guidelines above. I understand that I am responsible 
+                            for ensuring I have proper consent before cloning any voice, and I will use this technology 
+                            responsibly and legally.
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-check"></i> Enable Voice Cloning
+                    </button>
+                </form>
+            </div>
+        {% else %}
+            <!-- Quota Information -->
+            <div class="quota-info">
+                <h6><i class="fas fa-info-circle"></i> Voice Cloning Quota</h6>
+                <p class="mb-2">
+                    You have used <strong>{{ custom_voices|length }}</strong> of <strong>{{ user_data.voice_cloning_quota }}</strong> available voice slots.
+                </p>
+                <div class="progress" style="height: 8px;">
+                    <div class="progress-bar" role="progressbar" 
+                         data-width="{{ ((custom_voices|length / user_data.voice_cloning_quota * 100)|round) if (user_data.voice_cloning_quota and user_data.voice_cloning_quota > 0) else 0 }}"
+                         style="width: 0%">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Create New Voice Clone -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-plus-circle"></i> Create New Voice Clone</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data" id="voiceCloneForm">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input type="hidden" name="action" value="create_voice">
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="voice_name"><i class="fas fa-tag"></i> Voice Name</label>
+                                    <input type="text" name="voice_name" class="form-control" 
+                                           placeholder="e.g., My Voice, John's Voice" required>
+                                    <small class="form-text text-muted">Choose a descriptive name for your voice clone</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="voice_description"><i class="fas fa-comment"></i> Description (Optional)</label>
+                                    <input type="text" name="voice_description" class="form-control" 
+                                           placeholder="Brief description of the voice">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Audio Upload Section -->
+                        <div class="form-group">
+                            <label><i class="fas fa-microphone"></i> Voice Sample</label>
+                            
+                            <!-- File Upload -->
+                            <div class="file-drop-zone" id="fileDropZone">
+                                <i class="fas fa-cloud-upload-alt fa-3x mb-3"></i>
+                                <h5>Drop audio file here or click to browse</h5>
+                                <p class="text-muted">
+                                    Supported formats: WAV, MP3, M4A, FLAC, OGG<br>
+                                    Minimum: 10 seconds | Maximum: 5 minutes<br>
+                                    Recommended: Clear speech, minimal background noise
+                                </p>
+                                <input type="file" name="voice_sample" class="d-none" id="voiceSampleFile" 
+                                       accept=".wav,.mp3,.m4a,.flac,.ogg" required>
+                            </div>
+
+                            <!-- Recording Section -->
+                            <div class="recording-section">
+                                <h6><i class="fas fa-microphone"></i> Or Record New Sample</h6>
+                                <p class="text-muted">Record at least 10 seconds of clear speech</p>
+                                
+                                <button type="button" class="record-button" id="recordButton">
+                                    <i class="fas fa-microphone"></i>
+                                </button>
+                                
+                                <div id="recordingStatus" class="mt-2"></div>
+                                <div id="audioPreview" class="audio-preview d-none">
+                                    <audio controls class="w-100"></audio>
+                                    <button type="button" class="btn btn-sm btn-outline-light mt-2" id="useRecording">
+                                        <i class="fas fa-check"></i> Use This Recording
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-lg" id="createVoiceBtn">
+                                <i class="fas fa-magic"></i> Create Voice Clone
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Existing Voice Clones -->
+            {% if custom_voices %}
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-list"></i> Your Voice Clones</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for voice in custom_voices %}
+                            <div class="voice-item">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h6><i class="fas fa-user-circle"></i> {{ voice.name }}
+                                            <span class="provider-badge provider-{{ voice.get('provider', 'elevenlabs') }}">
+                                                {{ voice.get('provider', 'elevenlabs').upper() }}
+                                            </span>
+                                        </h6>
+                                        {% if voice.description %}
+                                            <p class="text-muted mb-2">{{ voice.description }}</p>
+                                        {% endif %}
+                                        <small class="text-muted">
+                                            <i class="fas fa-calendar"></i> Created: {{ voice.created_at[:10] }}
+                                            <span class="ml-3"><i class="fas fa-fingerprint"></i> ID: {{ voice.id[:8] }}...</span>
+                                            {% if voice.get('provider') == 'local' %}
+                                                <span class="ml-3"><i class="fas fa-hdd"></i> Local Model</span>
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="voice-actions">
+                                            <button class="btn btn-sm btn-success" onclick="previewVoice('{{ voice.id }}', '{{ voice.name }}')">
+                                                <i class="fas fa-play"></i> Preview
+                                            </button>
+                                            <button class="btn btn-sm btn-primary" onclick="useVoice('{{ voice.id }}')">
+                                                <i class="fas fa-check"></i> Use
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" onclick="deleteVoice('{{ voice.id }}', '{{ voice.name }}')">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <!-- Audio Preview Modal -->
+    <div class="modal fade" id="previewModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background: rgba(26, 26, 46, 0.95); color: white;">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-volume-up"></i> Voice Preview</h5>
+                    <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="previewContent">
+                        <p>Generating preview...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script>
+        let mediaRecorder;
+        let recordedChunks = [];
+        let isRecording = false;
+
+        // File drop zone functionality
+        const fileDropZone = document.getElementById('fileDropZone');
+        const fileInput = document.getElementById('voiceSampleFile');
+
+        fileDropZone.addEventListener('click', () => fileInput.click());
+        fileDropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileDropZone.classList.add('dragover');
+        });
+        fileDropZone.addEventListener('dragleave', () => {
+            fileDropZone.classList.remove('dragover');
+        });
+        fileDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileDropZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                updateFileDisplay(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                updateFileDisplay(e.target.files[0]);
+            }
+        });
+
+        function updateFileDisplay(file) {
+            fileDropZone.innerHTML = `
+                <i class="fas fa-file-audio fa-3x mb-3 text-success"></i>
+                <h5 class="text-success">File Selected</h5>
+                <p class="text-muted">${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)</p>
+                <small class="text-muted">Click to change file</small>
+            `;
+        }
+
+        // Recording functionality
+        const recordButton = document.getElementById('recordButton');
+        const recordingStatus = document.getElementById('recordingStatus');
+        const audioPreview = document.getElementById('audioPreview');
+
+        recordButton.addEventListener('click', toggleRecording);
+
+        async function toggleRecording() {
+            if (!isRecording) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    recordedChunks = [];
+
+                    mediaRecorder.ondataavailable = (event) => {
+                        if (event.data.size > 0) {
+                            recordedChunks.push(event.data);
+                        }
+                    };
+
+                    mediaRecorder.onstop = () => {
+                        const blob = new Blob(recordedChunks, { type: 'audio/wav' });
+                        const audioUrl = URL.createObjectURL(blob);
+                        
+                        audioPreview.querySelector('audio').src = audioUrl;
+                        audioPreview.classList.remove('d-none');
+                        
+                        // Store blob for later use
+                        audioPreview.audioBlob = blob;
+                    };
+
+                    mediaRecorder.start();
+                    isRecording = true;
+                    recordButton.classList.add('recording');
+                    recordButton.innerHTML = '<i class="fas fa-stop"></i>';
+                    recordingStatus.innerHTML = '<span class="text-success">Recording... Click to stop</span>';
+
+                } catch (error) {
+                    alert('Error accessing microphone: ' + error.message);
+                }
+            } else {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                isRecording = false;
+                recordButton.classList.remove('recording');
+                recordButton.innerHTML = '<i class="fas fa-microphone"></i>';
+                recordingStatus.innerHTML = '<span class="text-info">Recording saved. Preview below.</span>';
+            }
+        }
+
+        // Use recording button
+        document.getElementById('useRecording').addEventListener('click', () => {
+            const blob = audioPreview.audioBlob;
+            if (blob) {
+                // Create a file from the blob
+                const file = new File([blob], 'recorded_voice_sample.wav', { type: 'audio/wav' });
+                
+                // Create a new FileList and assign to input
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                fileInput.files = dataTransfer.files;
+                
+                updateFileDisplay(file);
+                audioPreview.classList.add('d-none');
+            }
+        });
+
+        // Voice management functions
+        function previewVoice(voiceId, voiceName) {
+            $('#previewModal').modal('show');
+            document.getElementById('previewContent').innerHTML = '<p>Generating preview...</p>';
+
+            fetch('/api/voice-clone/preview', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    voice_id: voiceId,
+                    text: 'Hello! This is a preview of your custom voice clone. How does it sound?'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('previewContent').innerHTML = `
+                        <h6>${voiceName}</h6>
+                        <audio controls class="w-100">
+                            <source src="${data.audio_url}" type="audio/mp3">
+                            Your browser does not support the audio element.
+                        </audio>
+                        <p class="text-muted mt-2">Preview text: "Hello! This is a preview of your custom voice clone. How does it sound?"</p>
+                    `;
+                } else {
+                    document.getElementById('previewContent').innerHTML = `
+                        <div class="alert alert-danger">Error: ${data.error}</div>
+                    `;
+                }
+            })
+            .catch(error => {
+                document.getElementById('previewContent').innerHTML = `
+                    <div class="alert alert-danger">Error generating preview: ${error.message}</div>
+                `;
+            });
+        }
+
+        function useVoice(voiceId) {
+            // Redirect to main page with voice selected
+            window.location.href = `/?voice=${voiceId}`;
+        }
+
+        function deleteVoice(voiceId, voiceName) {
+            if (confirm(`Are you sure you want to delete the voice clone "${voiceName}"? This action cannot be undone.`)) {
+                fetch(`/api/voice-clone/${voiceId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Voice clone deleted successfully.');
+                        location.reload();
+                    } else {
+                        alert('Error deleting voice clone: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    alert('Error: ' + error.message);
+                });
+            }
+        }
+
+        // Form submission handling
+        document.getElementById('voiceCloneForm').addEventListener('submit', function(e) {
+            const submitBtn = document.getElementById('createVoiceBtn');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Voice Clone...';
+            submitBtn.disabled = true;
+        });
+
+        // Set progress bar width from data attribute
+        document.addEventListener('DOMContentLoaded', function() {
+            const progressBar = document.querySelector('.progress-bar[data-width]');
+            if (progressBar) {
+                const width = progressBar.getAttribute('data-width');
+                progressBar.style.width = width + '%';
+            }
+        });
+    </script>
+</body>
+</html>

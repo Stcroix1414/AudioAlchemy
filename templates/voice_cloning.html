@@ -468,6 +468,9 @@
                                         <h6><i class="fas fa-user-circle"></i> {{ voice.name }}
                                             <span class="provider-badge provider-{{ voice.get('provider', 'elevenlabs') }}">
                                                 {{ voice.get('provider', 'elevenlabs').upper() }}
+                                                {% if voice.get('backend') %}
+                                                    ({{ voice.get('backend').upper() }})
+                                                {% endif %}
                                             </span>
                                         </h6>
                                         {% if voice.description %}

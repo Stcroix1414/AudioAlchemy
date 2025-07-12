@@ -201,65 +201,46 @@ def validate_voice_sample(filepath):
 def create_voice_clone_local(name, description, audio_file_path, user_id=None):
     """Create a voice clone using local TTS models (Tortoise-TTS or Coqui)"""
     try:
-        # Validate the audio sample
-        is_valid, message = validate_voice_sample(audio_file_path)
-        if not is_valid:
-            return None, message
+        from local_tts_models import local_voice_cloner
         
         # Check user quota
         user_data = load_user_data()
         if len(user_data.get('custom_voices', [])) >= user_data.get('voice_cloning_quota', 5):
             return None, "Voice cloning quota exceeded. Please remove existing voices or upgrade your plan."
         
-        # Generate unique voice ID for local model
-        voice_id = f"local_{uuid.uuid4().hex[:12]}"
+        # Use the local voice cloner
+        voice_id, message = local_voice_cloner.create_voice_clone(
+            name=name,
+            description=description,
+            audio_path=audio_file_path,
+            preferred_backend='auto'
+        )
         
-        # Create voice model directory
-        voice_model_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'voice_models', voice_id)
-        os.makedirs(voice_model_dir, exist_ok=True)
+        if voice_id:
+            # Get voice info from local cloner
+            voice_info = local_voice_cloner.get_voice_info(voice_id)
+            if voice_info:
+                # Add user-specific metadata
+                voice_info['user_id'] = user_id or 'default'
+                voice_info['provider'] = 'local'
+                
+                # Add to user's custom voices
+                user_data['custom_voices'].append(voice_info)
+                save_user_data(user_data)
+                
+                # Add to history
+                add_to_history('voice_clone', f"Created local voice clone: {name}", {
+                    'voice_id': voice_id,
+                    'name': name,
+                    'description': description,
+                    'provider': 'local',
+                    'backend': voice_info.get('backend', 'unknown')
+                })
         
-        # Copy and process audio file for training
-        processed_audio_path = os.path.join(voice_model_dir, 'training_audio.wav')
+        return voice_id, message
         
-        try:
-            # Convert to proper format for training (22kHz, mono)
-            command = [
-                'ffmpeg', '-i', audio_file_path, 
-                '-ar', '22050', '-ac', '1', '-y',
-                processed_audio_path
-            ]
-            subprocess.run(command, check=True, capture_output=True)
-        except subprocess.CalledProcessError as e:
-            return None, f"Audio preprocessing failed: {str(e)}"
-        
-        # Store voice information (local model)
-        voice_info = {
-            'id': voice_id,
-            'name': name,
-            'description': description,
-            'created_at': datetime.now().isoformat(),
-            'file_path': audio_file_path,
-            'model_path': voice_model_dir,
-            'processed_audio': processed_audio_path,
-            'user_id': user_id or 'default',
-            'provider': 'local',
-            'status': 'ready'  # For local models, we'll mark as ready immediately
-        }
-        
-        # Add to user's custom voices
-        user_data['custom_voices'].append(voice_info)
-        save_user_data(user_data)
-        
-        # Add to history
-        add_to_history('voice_clone', f"Created local voice clone: {name}", {
-            'voice_id': voice_id,
-            'name': name,
-            'description': description,
-            'provider': 'local'
-        })
-        
-        return voice_id, "Local voice clone created successfully."
-        
+    except ImportError as e:
+        return None, f"Local TTS models not available: {str(e)}"
     except Exception as e:
         return None, f"Local voice cloning error: {str(e)}"
 
@@ -361,19 +342,33 @@ def delete_voice_clone(voice_id):
         if not voice_to_remove:
             return False, "Voice not found."
         
-        # Delete from ElevenLabs
-        try:
-            if ELEVENLABS_CLIENT:
-                ELEVENLABS_CLIENT.delete(voice_id)
-            else:
-                from elevenlabs import delete
-                delete(voice_id)
-        except Exception as e:
-            print(f"Warning: Could not delete voice from ElevenLabs: {e}")
+        provider = voice_to_remove.get('provider', 'elevenlabs')
+        
+        # Delete from appropriate provider
+        if provider == 'elevenlabs':
+            try:
+                if ELEVENLABS_CLIENT:
+                    ELEVENLABS_CLIENT.delete(voice_id)
+                else:
+                    from elevenlabs import delete
+                    delete(voice_id)
+            except Exception as e:
+                print(f"Warning: Could not delete voice from ElevenLabs: {e}")
+        
+        elif provider == 'local':
+            try:
+                from local_tts_models import local_voice_cloner
+                success, message = local_voice_cloner.delete_voice_clone(voice_id)
+                if not success:
+                    print(f"Warning: Could not delete local voice clone: {message}")
+            except ImportError:
+                print("Warning: Local TTS models not available for cleanup")
+            except Exception as e:
+                print(f"Warning: Could not delete local voice clone: {e}")
         
         # Clean up local file
         try:
-            if os.path.exists(voice_to_remove['file_path']):
+            if 'file_path' in voice_to_remove and os.path.exists(voice_to_remove['file_path']):
                 os.remove(voice_to_remove['file_path'])
         except Exception as e:
             print(f"Warning: Could not delete local file: {e}")
@@ -384,7 +379,8 @@ def delete_voice_clone(voice_id):
         # Add to history
         add_to_history('voice_delete', f"Deleted voice clone: {voice_to_remove['name']}", {
             'voice_id': voice_id,
-            'name': voice_to_remove['name']
+            'name': voice_to_remove['name'],
+            'provider': provider
         })
         
         return True, "Voice clone deleted successfully."
@@ -403,6 +399,21 @@ def text_to_speech_enhanced(text, voice, model, provider='openai', voice_setting
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     
     try:
+        # Check if voice is a local voice clone
+        if voice.startswith(('tortoise_', 'coqui_', 'xtts_', 'local_')):
+            try:
+                from local_tts_models import local_voice_cloner
+                success, message = local_voice_cloner.synthesize_speech(text, voice, filepath)
+                if success:
+                    return filename
+                else:
+                    print(f"Local TTS failed: {message}")
+                    # Fall through to other providers
+            except ImportError:
+                print("Local TTS models not available")
+            except Exception as e:
+                print(f"Local TTS error: {str(e)}")
+        
         if provider == 'elevenlabs' and ELEVENLABS_API_KEY != 'your_elevenlabs_api_key_here':
             # Use ElevenLabs for high-quality TTS
             voice_settings = voice_settings or {}

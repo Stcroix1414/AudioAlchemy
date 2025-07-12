@@ -1,0 +1,134 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #1a1a2e; /* Dark space-like background */
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to bottom, #1a1a2e, #16213e); /* Gradient background for a cosmic feel */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.1); /* Slight transparent background for space effect */
+    border-radius: 12px;
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.2); /* Glowing effect for a space look */
+    backdrop-filter: blur(10px); /* Add a blur effect for space theme */
+}
+
+h1, h2, h3 {
+    text-align: center;
+    color: #fff;
+    text-shadow: 0px 0px 10px rgba(255, 255, 255, 0.8), 0px 0px 20px rgba(255, 255, 255, 0.6);
+}
+
+.form-section {
+    margin: 30px 0;
+    padding: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Slight glowing border */
+    border-radius: 8px;
+    background-color: rgba(24, 29, 45, 0.6); /* Dark background for form sections */
+}
+
+input[type="file"],
+input[type="text"],
+textarea,
+select {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0 15px;
+    border-radius: 6px;
+    border: 1px solid #3f8efc; /* Space blue border */
+    font-size: 16px;
+    background-color: rgba(255, 255, 255, 0.2); /* Slightly transparent input */
+    color: #fff;
+}
+
+input[type="file"]:focus,
+input[type="text"]:focus,
+textarea:focus,
+select:focus {
+    border-color: #266fd9; /* Focused input will have brighter blue */
+    outline: none;
+    box-shadow: 0 0 8px rgba(38, 111, 217, 0.8);
+}
+
+button {
+    background-color: #3f8efc;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    text-transform: uppercase;
+    box-shadow: 0px 0px 15px rgba(63, 142, 252, 0.6); /* Glow effect on button */
+}
+
+button:hover {
+    background-color: #266fd9;
+    box-shadow: 0px 0px 25px rgba(38, 111, 217, 0.9); /* Stronger glow on hover */
+}
+
+.output {
+    margin-top: 25px;
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #fff;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
+}
+
+audio {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.flashes {
+    list-style-type: none;
+    padding: 0;
+}
+
+.flashes li {
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+.flash-danger {
+    background-color: rgba(248, 215, 218, 0.8); /* Soft red for errors */
+    color: #721c24;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+}
+
+.nav-tabs {
+    border-bottom: 2px solid #3f8efc; /* Blue tab separator */
+}
+
+.nav-tabs .nav-item .nav-link {
+    color: #fff;
+    background-color: #16213e;
+    border-radius: 8px 8px 0 0;
+    padding: 12px;
+}
+
+.nav-tabs .nav-item .nav-link.active {
+    color: #fff;
+    background-color: #3f8efc;
+    box-shadow: 0px 4px 8px rgba(63, 142, 252, 0.6);
+}
+
+.nav-tabs .nav-item .nav-link:hover {
+    background-color: #266fd9;
+}
+
+.tab-content {
+    margin-top: 20px;
+}

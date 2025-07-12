@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preferences - Enhanced Voice AI</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3f8efc;
+            --secondary-color: #266fd9;
+            --background-dark: #1a1a2e;
+            --background-light: #16213e;
+            --text-light: #fff;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--background-dark), var(--background-light));
+            color: var(--text-light);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background-attachment: fixed;
+        }
+
+        .navbar {
+            background: rgba(26, 26, 46, 0.95) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(63, 142, 252, 0.3);
+        }
+
+        .navbar-brand {
+            color: var(--primary-color) !important;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--text-light) !important;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+
+        .container-main {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            background: rgba(63, 142, 252, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px 15px 0 0 !important;
+        }
+
+        .form-control, .form-control:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: var(--text-light);
+            border-radius: 8px;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(63, 142, 252, 0.25);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(63, 142, 252, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: var(--text-light);
+            border-radius: 8px;
+        }
+
+        .range-slider {
+            margin: 15px 0;
+        }
+
+        .range-slider input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .range-slider input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .range-slider input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: none;
+        }
+
+        .range-value {
+            display: inline-block;
+            min-width: 40px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+
+        .alert-success {
+            background: rgba(40, 167, 69, 0.2);
+            color: #d4edda;
+        }
+
+        .alert-danger {
+            background: rgba(220, 53, 69, 0.2);
+            color: #f8d7da;
+        }
+
+        .provider-option {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .provider-option:hover {
+            border-color: var(--primary-color);
+            background: rgba(63, 142, 252, 0.1);
+        }
+
+        .provider-option.selected {
+            border-color: var(--primary-color);
+            background: rgba(63, 142, 252, 0.2);
+        }
+
+        .provider-option input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .voice-preview {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-microphone-alt"></i> Enhanced Voice AI
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="fas fa-home"></i> Home</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/preferences"><i class="fas fa-cog"></i> Preferences</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/history"><i class="fas fa-history"></i> History</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-main">
+        <h1 class="text-center mb-4">
+            <i class="fas fa-cog"></i> User Preferences
+        </h1>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if 'danger' in category else 'success' if 'success' in category else 'info' }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <!-- Personal Information -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-user"></i> Personal Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="name"><i class="fas fa-id-card"></i> Display Name</label>
+                        <input type="text" name="name" class="form-control" value="{{ user_data.name }}" required>
+                        <small class="form-text text-muted">This name will be displayed in the welcome message</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TTS Provider Selection -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-volume-up"></i> Text-to-Speech Provider</h5>
+                </div>
+                <div class="card-body">
+                    <div class="provider-option {{ 'selected' if user_data.tts_provider == 'openai' else '' }}" onclick="selectProvider('openai')">
+                        <input type="radio" name="tts_provider" value="openai" {{ 'checked' if user_data.tts_provider == 'openai' else '' }}>
+                        <strong>OpenAI TTS</strong>
+                        <p class="mb-0 text-muted">High-quality neural voices with good performance</p>
+                    </div>
+                    
+                    <div class="provider-option {{ 'selected' if user_data.tts_provider == 'elevenlabs' else '' }}" onclick="selectProvider('elevenlabs')">
+                        <input type="radio" name="tts_provider" value="elevenlabs" {{ 'checked' if user_data.tts_provider == 'elevenlabs' else '' }}>
+                        <strong>ElevenLabs</strong>
+                        <p class="mb-0 text-muted">Premium AI voices with advanced customization options</p>
+                        {% if not elevenlabs_voices %}
+                            <small class="text-warning">⚠️ API key required</small>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="provider-option {{ 'selected' if user_data.tts_provider == 'gtts' else '' }}" onclick="selectProvider('gtts')">
+                        <input type="radio" name="tts_provider" value="gtts" {{ 'checked' if user_data.tts_provider == 'gtts' else '' }}>
+                        <strong>Google TTS</strong>
+                        <p class="mb-0 text-muted">Free and reliable text-to-speech service</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Voice Settings -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-microphone"></i> Voice Settings</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="preferred_voice"><i class="fas fa-user-circle"></i> Preferred Voice</label>
+                                <select name="preferred_voice" class="form-control" id="openai-voices">
+                                    <option value="echo" {{ 'selected' if user_data.preferred_voice == 'echo' else '' }}>Echo</option>
+                                    <option value="alloy" {{ 'selected' if user_data.preferred_voice == 'alloy' else '' }}>Alloy</option>
+                                    <option value="fable" {{ 'selected' if user_data.preferred_voice == 'fable' else '' }}>Fable</option>
+                                    <option value="nova" {{ 'selected' if user_data.preferred_voice == 'nova' else '' }}>Nova</option>
+                                    <option value="onyx" {{ 'selected' if user_data.preferred_voice == 'onyx' else '' }}>Onyx</option>
+                                    <option value="shimmer" {{ 'selected' if user_data.preferred_voice == 'shimmer' else '' }}>Shimmer</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="preferred_model"><i class="fas fa-cogs"></i> Preferred Model</label>
+                                <select name="preferred_model" class="form-control">
+                                    <option value="tts-1" {{ 'selected' if user_data.preferred_model == 'tts-1' else '' }}>TTS-1 (Fast)</option>
+                                    <option value="tts-1-hd" {{ 'selected' if user_data.preferred_model == 'tts-1-hd' else '' }}>TTS-1 HD (High Quality)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ElevenLabs Voice Selection -->
+                    {% if elevenlabs_voices %}
+                        <div class="form-group{% if user_data.tts_provider != 'elevenlabs' %} d-none{% endif %}" id="elevenlabs-voice-group">
+                            <label for="elevenlabs_voice_id"><i class="fas fa-star"></i> ElevenLabs Voice</label>
+                            <select name="elevenlabs_voice_id" class="form-control">
+                                <option value="">Select a voice...</option>
+                                {% for voice_id, voice_name in elevenlabs_voices %}
+                                    <option value="{{ voice_id }}" {{ 'selected' if user_data.elevenlabs_voice_id == voice_id else '' }}>
+                                        {{ voice_name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    {% endif %}
+
+                    <!-- Voice Parameters -->
+                    <div class="range-slider">
+                        <label><i class="fas fa-tachometer-alt"></i> Speech Speed</label>
+                        <div class="d-flex align-items-center">
+                            <input type="range" name="voice_speed" min="0.25" max="4.0" step="0.25" 
+                                   value="{{ user_data.voice_speed }}" oninput="updateRangeValue(this, 'speed-value')">
+                            <span class="range-value ml-2" id="speed-value">{{ user_data.voice_speed }}</span>
+                        </div>
+                    </div>
+
+                    <div class="range-slider">
+                        <label><i class="fas fa-balance-scale"></i> Voice Stability (ElevenLabs)</label>
+                        <div class="d-flex align-items-center">
+                            <input type="range" name="voice_stability" min="0" max="1" step="0.1" 
+                                   value="{{ user_data.voice_stability }}" oninput="updateRangeValue(this, 'stability-value')">
+                            <span class="range-value ml-2" id="stability-value">{{ user_data.voice_stability }}</span>
+                        </div>
+                    </div>
+
+                    <div class="range-slider">
+                        <label><i class="fas fa-volume-up"></i> Voice Clarity (ElevenLabs)</label>
+                        <div class="d-flex align-items-center">
+                            <input type="range" name="voice_clarity" min="0" max="1" step="0.1" 
+                                   value="{{ user_data.voice_clarity }}" oninput="updateRangeValue(this, 'clarity-value')">
+                            <span class="range-value ml-2" id="clarity-value">{{ user_data.voice_clarity }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Voice Preview -->
+                    <div class="voice-preview">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="previewVoice()">
+                            <i class="fas fa-play"></i> Preview Voice
+                        </button>
+                        <small class="text-muted ml-2">Test your current voice settings</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Language Settings -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-globe"></i> Language Settings</h5>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="preferred_language"><i class="fas fa-language"></i> Preferred Language</label>
+                        <input type="text" name="preferred_language" class="form-control" 
+                               value="{{ user_data.preferred_language }}" 
+                               placeholder="e.g., en, es, fr, de">
+                        <small class="form-text text-muted">Default language for transcription and translation</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Theme Settings -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-palette"></i> Appearance</h5>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="theme"><i class="fas fa-moon"></i> Theme</label>
+                        <select name="theme" class="form-control">
+                            <option value="dark" {{ 'selected' if user_data.theme == 'dark' else '' }}>Dark Theme</option>
+                            <option value="light" {{ 'selected' if user_data.theme == 'light' else '' }}>Light Theme</option>
+                            <option value="auto" {{ 'selected' if user_data.theme == 'auto' else '' }}>Auto (System)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-save"></i> Save Preferences
+                </button>
+                <a href="/" class="btn btn-secondary btn-lg ml-3">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script>
+        function selectProvider(provider) {
+            // Update radio button
+            var radioButton = document.querySelector('input[value="' + provider + '"]');
+            if (radioButton) {
+                radioButton.checked = true;
+            }
+            
+            // Update visual selection
+            var providerOptions = document.querySelectorAll('.provider-option');
+            providerOptions.forEach(function(el) {
+                el.classList.remove('selected');
+            });
+            
+            if (event && event.currentTarget) {
+                event.currentTarget.classList.add('selected');
+            }
+            
+            // Show/hide ElevenLabs voice selection
+            var elevenlabsGroup = document.getElementById('elevenlabs-voice-group');
+            if (elevenlabsGroup) {
+                elevenlabsGroup.style.display = provider === 'elevenlabs' ? 'block' : 'none';
+            }
+        }
+
+        function updateRangeValue(slider, valueId) {
+            document.getElementById(valueId).textContent = slider.value;
+        }
+
+        function previewVoice() {
+            var formData = new FormData();
+            formData.append('text_input', 'Hello! This is a preview of your selected voice settings.');
+            formData.append('voice', document.querySelector('[name="preferred_voice"]').value);
+            formData.append('model', document.querySelector('[name="preferred_model"]').value);
+            
+            fetch('/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(function(response) {
+                if (response.ok) {
+                    alert('Voice preview generated! Check the main page to listen.');
+                } else {
+                    alert('Error generating voice preview');
+                }
+            })
+            .catch(function(error) {
+                alert('Error: ' + error.message);
+            });
+        }
+
+        // Initialize provider selection on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            var selectedProvider = document.querySelector('input[name="tts_provider"]:checked');
+            if (selectedProvider) {
+                selectProvider(selectedProvider.value);
+            }
+        });
+    </script>
+</body>
+</html>

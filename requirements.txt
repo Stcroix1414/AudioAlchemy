@@ -1,0 +1,8 @@
+Flask>=2.3
+SpeechRecognition>=3.8
+pydub>=0.25
+deep-translator>=1.11
+openai-whisper @ git+https://github.com/openai/whisper.git
+elevenlabs>=1.1
+numpy>=1.24
+torch>=2.0

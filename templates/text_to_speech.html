@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Text-to-Speech Converter</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>🎙️ Text-to-Speech Converter</h1>
+
+        <form method="POST">
+            <label for="text_input">Enter Text to Convert to Speech:</label>
+            <textarea name="text_input" required></textarea>
+            <button type="submit">Convert to Speech</button>
+        </form>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% if speech_file %}
+            <h2>🎧 Playback (Text-to-Speech)</h2>
+            <audio controls>
+                <source src="{{ url_for('uploaded_file', filename=speech_file) }}" type="audio/mp3">
+                Your browser does not support the audio tag.
+            </audio>
+        {% endif %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Voice Transcription and TTS</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3f8efc;
+            --secondary-color: #266fd9;
+            --background-dark: #1a1a2e;
+            --background-light: #16213e;
+            --text-light: #fff;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--background-dark), var(--background-light));
+            color: var(--text-light);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background-attachment: fixed;
+        }
+
+        .navbar {
+            background: rgba(26, 26, 46, 0.95) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(63, 142, 252, 0.3);
+        }
+
+        .navbar-brand {
+            color: var(--primary-color) !important;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--text-light) !important;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+
+        .container-main {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .welcome-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(63, 142, 252, 0.3);
+        }
+
+        .card-header {
+            background: rgba(63, 142, 252, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px 15px 0 0 !important;
+        }
+
+        .form-control, .form-control:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: var(--text-light);
+            border-radius: 8px;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(63, 142, 252, 0.25);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(63, 142, 252, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, var(--success-color), #20c997);
+            border: none;
+            border-radius: 8px;
+        }
+
+        .btn-outline-light {
+            border-color: rgba(255, 255, 255, 0.3);
+            color: var(--text-light);
+        }
+
+        .btn-outline-light:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        .nav-tabs {
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .nav-tabs .nav-link {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-light);
+            border-radius: 8px 8px 0 0;
+            margin-right: 5px;
+        }
+
+        .nav-tabs .nav-link.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .tab-content {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0 15px 15px 15px;
+            padding: 20px;
+        }
+
+        .favorites-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .favorite-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .voice-controls {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .range-slider {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .range-slider input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+        }
+
+        .range-slider input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+
+        .alert-success {
+            background: rgba(40, 167, 69, 0.2);
+            color: #d4edda;
+        }
+
+        .alert-danger {
+            background: rgba(220, 53, 69, 0.2);
+            color: #f8d7da;
+        }
+
+        .result-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .provider-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .provider-openai { background: rgba(0, 163, 108, 0.3); }
+        .provider-elevenlabs { background: rgba(138, 43, 226, 0.3); }
+        .provider-gtts { background: rgba(255, 193, 7, 0.3); }
+
+        @media (max-width: 768px) {
+            .container-main {
+                margin: 15px;
+                padding: 15px;
+            }
+            
+            .quick-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-microphone-alt"></i> Enhanced Voice AI
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="fas fa-home"></i> Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/preferences"><i class="fas fa-cog"></i> Preferences</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/history"><i class="fas fa-history"></i> History</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-main">
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <h1 class="text-center mb-3">
+                <i class="fas fa-robot"></i> Welcome back, {{ user_prefs.name }}!
+            </h1>
+            <p class="text-center mb-0">
+                Your personalized voice transcription and text-to-speech assistant
+                <span class="provider-badge provider-{{ user_prefs.tts_provider }}">
+                    {{ user_prefs.tts_provider.upper() }}
+                </span>
+            </p>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if 'danger' in category else 'success' if 'success' in category else 'info' }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Main Tabs -->
+        <ul class="nav nav-tabs" id="mainTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="transcription-tab" data-toggle="tab" href="#transcription" role="tab">
+                    <i class="fas fa-file-audio"></i> Transcription
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="translate-tab" data-toggle="tab" href="#translate" role="tab">
+                    <i class="fas fa-language"></i> Translate
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="tts-tab" data-toggle="tab" href="#tts" role="tab">
+                    <i class="fas fa-volume-up"></i> Text-to-Speech
+                </a>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="mainTabContent">
+            <!-- Transcription Tab -->
+            <div class="tab-pane fade show active" id="transcription" role="tabpanel">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-microphone"></i> Audio Transcription</h5>
+                    </div>
+                    <div class="card-body">
+                        <form action="/" method="POST" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label for="file"><i class="fas fa-upload"></i> Choose Audio File</label>
+                                <input type="file" name="file" class="form-control-file" accept=".wav,.mp3,.m4a,.flac,.ogg" required>
+                                <small class="form-text text-muted">Supported formats: WAV, MP3, M4A, FLAC, OGG</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="target_language"><i class="fas fa-globe"></i> Translate to (optional)</label>
+                                <input type="text" name="target_language" class="form-control" 
+                                       placeholder="Enter language code (e.g., 'fr' for French)"
+                                       list="recent-languages">
+                                <datalist id="recent-languages">
+                                    {% for lang in user_prefs.recent_languages %}
+                                        <option value="{{ lang }}">
+                                    {% endfor %}
+                                </datalist>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-play"></i> Transcribe Audio
+                            </button>
+                        </form>
+
+                        {% if transcription %}
+                            <div class="result-section">
+                                <h5><i class="fas fa-file-alt"></i> Transcription Result</h5>
+                                <p class="mb-3">{{ transcription }}</p>
+                                <div class="quick-actions">
+                                    <a href="{{ url_for('download_transcription') }}" class="btn btn-success btn-sm">
+                                        <i class="fas fa-download"></i> Download
+                                    </a>
+                                    <button class="btn btn-outline-light btn-sm" data-text="{{ transcription|e }}" onclick="addToFavorites(this.dataset.text)">
+                                        <i class="fas fa-heart"></i> Add to Favorites
+                                    </button>
+                                    <button class="btn btn-outline-light btn-sm" data-text="{{ transcription|e }}" onclick="copyToClipboard(this.dataset.text)">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if translated_text %}
+                            <div class="result-section">
+                                <h5><i class="fas fa-language"></i> Translation Result</h5>
+                                <p class="mb-3">{{ translated_text }}</p>
+                                <div class="quick-actions">
+                                    <button class="btn btn-outline-light btn-sm" data-text="{{ translated_text|e }}" onclick="addToFavorites(this.dataset.text)">
+                                        <i class="fas fa-heart"></i> Add to Favorites
+                                    </button>
+                                    <button class="btn btn-outline-light btn-sm" data-text="{{ translated_text|e }}" onclick="copyToClipboard(this.dataset.text)">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Translation Tab -->
+            <div class="tab-pane fade" id="translate" role="tabpanel">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-language"></i> Text Translation</h5>
+                    </div>
+                    <div class="card-body">
+                        <form action="/" method="POST">
+                            <div class="form-group">
+                                <label for="text_input"><i class="fas fa-edit"></i> Text to Translate</label>
+                                <textarea name="text_input" class="form-control" rows="3" 
+                                          placeholder="Enter text to translate" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="target_language"><i class="fas fa-globe"></i> Target Language</label>
+                                <input type="text" name="target_language" class="form-control" 
+                                       placeholder="Enter language code (e.g., 'fr' for French)" required
+                                       list="recent-languages">
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-language"></i> Translate Text
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TTS Tab -->
+            <div class="tab-pane fade" id="tts" role="tabpanel">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-volume-up"></i> Text-to-Speech</h5>
+                    </div>
+                    <div class="card-body">
+                        <form action="/" method="POST">
+                            <div class="form-group">
+                                <label for="text_input"><i class="fas fa-edit"></i> Text to Convert</label>
+                                <textarea name="text_input" class="form-control" rows="3" 
+                                          placeholder="Enter text to convert to speech" required></textarea>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="voice"><i class="fas fa-user"></i> Voice</label>
+                                        <select name="voice" class="form-control">
+                                            {% if user_prefs.tts_provider == 'elevenlabs' and elevenlabs_voices %}
+                                                {% for voice_id, voice_name in elevenlabs_voices %}
+                                                    <option value="{{ voice_id }}" 
+                                                            {% if voice_id == user_prefs.elevenlabs_voice_id %}selected{% endif %}>
+                                                        {{ voice_name }}
+                                                    </option>
+                                                {% endfor %}
+                                            {% else %}
+                                                <option value="echo" {% if user_prefs.preferred_voice == 'echo' %}selected{% endif %}>Echo</option>
+                                                <option value="alloy" {% if user_prefs.preferred_voice == 'alloy' %}selected{% endif %}>Alloy</option>
+                                                <option value="fable" {% if user_prefs.preferred_voice == 'fable' %}selected{% endif %}>Fable</option>
+                                                <option value="nova" {% if user_prefs.preferred_voice == 'nova' %}selected{% endif %}>Nova</option>
+                                                <option value="onyx" {% if user_prefs.preferred_voice == 'onyx' %}selected{% endif %}>Onyx</option>
+                                                <option value="shimmer" {% if user_prefs.preferred_voice == 'shimmer' %}selected{% endif %}>Shimmer</option>
+                                            {% endif %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="model"><i class="fas fa-cogs"></i> Model</label>
+                                        <select name="model" class="form-control">
+                                            <option value="tts-1" {% if user_prefs.preferred_model == 'tts-1' %}selected{% endif %}>TTS-1 (Fast)</option>
+                                            <option value="tts-1-hd" {% if user_prefs.preferred_model == 'tts-1-hd' %}selected{% endif %}>TTS-1 HD (High Quality)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-play"></i> Generate Speech
+                            </button>
+                        </form>
+
+                        {% if speech_file %}
+                            <div class="result-section">
+                                <h5><i class="fas fa-volume-up"></i> Generated Speech</h5>
+                                <audio controls class="w-100 mb-3">
+                                    <source src="{{ url_for('uploaded_file', filename=speech_file) }}" type="audio/mp3">
+                                    Your browser does not support the audio element.
+                                </audio>
+                                <div class="quick-actions">
+                                    <a href="{{ url_for('download_speech') }}" class="btn btn-success btn-sm">
+                                        <i class="fas fa-download"></i> Download MP3
+                                    </a>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Favorites Section -->
+                {% if user_prefs.favorite_phrases %}
+                    <div class="favorites-section">
+                        <h6><i class="fas fa-heart"></i> Favorite Phrases</h6>
+                        {% for phrase in user_prefs.favorite_phrases %}
+                            <div class="favorite-item">
+                                <span>{{ phrase[:50] }}{% if phrase|length > 50 %}...{% endif %}</span>
+                                <div>
+                                    <button class="btn btn-sm btn-outline-light" data-phrase="{{ phrase|e }}" onclick="useFavorite(this.dataset.phrase)">
+                                        <i class="fas fa-play"></i> Use
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" data-index="{{ loop.index0 }}" onclick="removeFavorite(this.dataset.index)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script>
+        // Remember active tab
+        $(document).ready(function () {
+            var activeTab = localStorage.getItem('activeTab');
+            if (activeTab) {
+                $('#mainTab a[href="' + activeTab + '"]').tab('show');
+            }
+
+            $('#mainTab a').on('click', function (e) {
+                e.preventDefault();
+                $(this).tab('show');
+                localStorage.setItem('activeTab', $(this).attr('href'));
+            });
+        });
+
+        // Add to favorites
+        function addToFavorites(text) {
+            fetch('/api/favorites', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ phrase: text })
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                if (data.success) {
+                    alert('Added to favorites!');
+                    location.reload();
+                } else {
+                    alert('Error adding to favorites');
+                }
+            })
+            .catch(function(error) {
+                alert('Error: ' + error.message);
+            });
+        }
+
+        // Remove from favorites
+        function removeFavorite(index) {
+            if (confirm('Remove this phrase from favorites?')) {
+                fetch('/api/favorites/' + index, {
+                    method: 'DELETE'
+                })
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(data) {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error removing favorite');
+                    }
+                })
+                .catch(function(error) {
+                    alert('Error: ' + error.message);
+                });
+            }
+        }
+
+        // Use favorite phrase
+        function useFavorite(phrase) {
+            var textareas = document.querySelectorAll('textarea[name="text_input"]');
+            if (textareas.length > 0) {
+                textareas[textareas.length - 1].value = phrase;
+            }
+            $('#tts-tab').tab('show');
+        }
+
+        // Copy to clipboard
+        function copyToClipboard(text) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(function() {
+                    alert('Copied to clipboard!');
+                }).catch(function(err) {
+                    fallbackCopyTextToClipboard(text);
+                });
+            } else {
+                fallbackCopyTextToClipboard(text);
+            }
+        }
+
+        function fallbackCopyTextToClipboard(text) {
+            var textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.position = "fixed";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                var successful = document.execCommand('copy');
+                if (successful) {
+                    alert('Copied to clipboard!');
+                } else {
+                    alert('Failed to copy text');
+                }
+            } catch (err) {
+                alert('Failed to copy text');
+            }
+            document.body.removeChild(textArea);
+        }
+    </script>
+</body>
+</html>

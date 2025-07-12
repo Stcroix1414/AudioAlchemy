@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History - Enhanced Voice AI</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3f8efc;
+            --secondary-color: #266fd9;
+            --background-dark: #1a1a2e;
+            --background-light: #16213e;
+            --text-light: #fff;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--background-dark), var(--background-light));
+            color: var(--text-light);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background-attachment: fixed;
+        }
+
+        .navbar {
+            background: rgba(26, 26, 46, 0.95) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(63, 142, 252, 0.3);
+        }
+
+        .navbar-brand {
+            color: var(--primary-color) !important;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--text-light) !important;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+
+        .container-main {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .history-item {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 20px;
+            padding: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .history-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(63, 142, 252, 0.2);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .history-type {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .type-transcription {
+            background: rgba(40, 167, 69, 0.3);
+            color: #d4edda;
+        }
+
+        .type-translation {
+            background: rgba(255, 193, 7, 0.3);
+            color: #fff3cd;
+        }
+
+        .type-tts {
+            background: rgba(138, 43, 226, 0.3);
+            color: #e2d9f3;
+        }
+
+        .history-timestamp {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .history-content {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .history-metadata {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .history-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            border-radius: 6px;
+        }
+
+        .btn-outline-light {
+            border-color: rgba(255, 255, 255, 0.3);
+            color: var(--text-light);
+        }
+
+        .btn-outline-light:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        .filter-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: var(--text-light);
+            border-radius: 8px;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(63, 142, 252, 0.25);
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .container-main {
+                margin: 15px;
+                padding: 15px;
+            }
+            
+            .history-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .history-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-microphone-alt"></i> Enhanced Voice AI
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="fas fa-home"></i> Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/preferences"><i class="fas fa-cog"></i> Preferences</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/history"><i class="fas fa-history"></i> History</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-main">
+        <h1 class="text-center mb-4">
+            <i class="fas fa-history"></i> Activity History
+        </h1>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="typeFilter"><i class="fas fa-filter"></i> Filter by Type</label>
+                    <select id="typeFilter" class="form-control" onchange="filterHistory()">
+                        <option value="">All Types</option>
+                        <option value="transcription">Transcription</option>
+                        <option value="translation">Translation</option>
+                        <option value="tts">Text-to-Speech</option>
+                    </select>
+                </div>
+                <div class="col-md-8">
+                    <label for="searchFilter"><i class="fas fa-search"></i> Search Content</label>
+                    <input type="text" id="searchFilter" class="form-control" 
+                           placeholder="Search in history content..." 
+                           oninput="filterHistory()">
+                </div>
+            </div>
+        </div>
+
+        <!-- History Items -->
+        <div id="historyContainer">
+            {% if history %}
+                {% for item in history %}
+                    <div class="history-item" data-type="{{ item.type }}" data-content="{{ item.content.lower() }}">
+                        <div class="history-header">
+                            <div>
+                                <span class="history-type type-{{ item.type }}">
+                                    {% if item.type == 'transcription' %}
+                                        <i class="fas fa-file-audio"></i> Transcription
+                                    {% elif item.type == 'translation' %}
+                                        <i class="fas fa-language"></i> Translation
+                                    {% elif item.type == 'tts' %}
+                                        <i class="fas fa-volume-up"></i> Text-to-Speech
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="history-timestamp">
+                                <i class="fas fa-clock"></i>
+                                {{ item.timestamp[:19].replace('T', ' ') }}
+                            </div>
+                        </div>
+
+                        <div class="history-content">
+                            {{ item.content }}
+                        </div>
+
+                        {% if item.metadata %}
+                            <div class="history-metadata">
+                                {% if item.type == 'transcription' %}
+                                    {% if item.metadata.original_filename %}
+                                        <strong>Original File:</strong> {{ item.metadata.original_filename }}<br>
+                                    {% endif %}
+                                    {% if item.metadata.converted_filename %}
+                                        <strong>Processed File:</strong> {{ item.metadata.converted_filename }}
+                                    {% endif %}
+                                {% elif item.type == 'translation' %}
+                                    {% if item.metadata.original_text %}
+                                        <strong>Original:</strong> {{ item.metadata.original_text[:100] }}{% if item.metadata.original_text|length > 100 %}...{% endif %}<br>
+                                    {% endif %}
+                                    {% if item.metadata.target_language %}
+                                        <strong>Target Language:</strong> {{ item.metadata.target_language }}
+                                    {% endif %}
+                                {% elif item.type == 'tts' %}
+                                    {% if item.metadata.voice %}
+                                        <strong>Voice:</strong> {{ item.metadata.voice }}<br>
+                                    {% endif %}
+                                    {% if item.metadata.model %}
+                                        <strong>Model:</strong> {{ item.metadata.model }}<br>
+                                    {% endif %}
+                                    {% if item.metadata.provider %}
+                                        <strong>Provider:</strong> {{ item.metadata.provider.upper() }}
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        {% endif %}
+
+                        <div class="history-actions">
+                            <button class="btn btn-outline-light btn-sm" onclick="copyToClipboard('{{ item.content }}')">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                            
+                            {% if item.type == 'tts' and item.metadata.filename %}
+                                <a href="/uploads/{{ item.metadata.filename }}" class="btn btn-outline-light btn-sm" download>
+                                    <i class="fas fa-download"></i> Download Audio
+                                </a>
+                            {% endif %}
+                            
+                            <button class="btn btn-outline-light btn-sm" onclick="reuseContent('{{ item.content }}', '{{ item.type }}')">
+                                <i class="fas fa-redo"></i> Reuse
+                            </button>
+                            
+                            <button class="btn btn-outline-light btn-sm" onclick="addToFavorites('{{ item.content }}')">
+                                <i class="fas fa-heart"></i> Favorite
+                            </button>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-history"></i>
+                    <h3>No History Yet</h3>
+                    <p>Your transcription, translation, and text-to-speech activities will appear here.</p>
+                    <a href="/" class="btn btn-primary">
+                        <i class="fas fa-microphone"></i> Start Using the App
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- No Results Message -->
+        <div id="noResults" class="empty-state" style="display: none;">
+            <i class="fas fa-search"></i>
+            <h3>No Results Found</h3>
+            <p>Try adjusting your search criteria or filters.</p>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script>
+        function filterHistory() {
+            const typeFilter = document.getElementById('typeFilter').value.toLowerCase();
+            const searchFilter = document.getElementById('searchFilter').value.toLowerCase();
+            const historyItems = document.querySelectorAll('.history-item');
+            let visibleCount = 0;
+
+            historyItems.forEach(item => {
+                const itemType = item.getAttribute('data-type');
+                const itemContent = item.getAttribute('data-content');
+                
+                const typeMatch = !typeFilter || itemType === typeFilter;
+                const searchMatch = !searchFilter || itemContent.includes(searchFilter);
+                
+                if (typeMatch && searchMatch) {
+                    item.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Show/hide no results message
+            const noResults = document.getElementById('noResults');
+            if (visibleCount === 0 && historyItems.length > 0) {
+                noResults.style.display = 'block';
+            } else {
+                noResults.style.display = 'none';
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                alert('Copied to clipboard!');
+            }).catch(function(err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('Copied to clipboard!');
+            });
+        }
+
+        function reuseContent(content, type) {
+            // Store content in localStorage and redirect to main page
+            localStorage.setItem('reuseContent', content);
+            localStorage.setItem('reuseType', type);
+            
+            if (type === 'tts') {
+                localStorage.setItem('activeTab', '#tts');
+            } else if (type === 'translation') {
+                localStorage.setItem('activeTab', '#translate');
+            }
+            
+            window.location.href = '/';
+        }
+
+        function addToFavorites(text) {
+            fetch('/api/favorites', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ phrase: text })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Added to favorites!');
+                } else {
+                    alert('Error adding to favorites');
+                }
+            })
+            .catch(error => {
+                alert('Error: ' + error.message);
+            });
+        }
+
+        // Auto-fill content if coming from reuse
+        document.addEventListener('DOMContentLoaded', function() {
+            const reuseContent = localStorage.getItem('reuseContent');
+            const reuseType = localStorage.getItem('reuseType');
+            
+            if (reuseContent) {
+                // This would be handled on the main page
+                localStorage.removeItem('reuseContent');
+                localStorage.removeItem('reuseType');
+            }
+        });
+    </script>
+</body>
+</html>

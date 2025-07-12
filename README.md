@@ -338,9 +338,103 @@ For issues and questions:
 2. Review existing issues on GitHub
 3. Create a new issue with detailed information
 
+## Support AudioAlchemy Development
+
+If you find AudioAlchemy helpful for your voice transformation needs, consider supporting its continued development and maintenance. Your contributions help keep this tool free and accessible to everyone.
+
+### 💖 Donation Methods
+
+#### Platform Donations
+- **Buy Me a Coffee**: [coff.ee/stcroix14](https://coff.ee/stcroix14)
+  - Quick and easy one-time or recurring support
+  - Perfect for showing appreciation for the project
+
+#### Cryptocurrency Donations
+- **Solana (SOL)**: `BzYvTkZ2huyicfLRQP1d35NtLx1RtYZprfpTaRUiNELP`
+  - Fast and low-cost transactions
+  - QR codes available in the application interface
+  - Copy address directly from the web interface
+
+### 🎯 How Donations Help
+
+Your support enables:
+- **Continuous Development**: New features and improvements
+- **Maintenance**: Bug fixes and security updates
+
+### 🔒 Donation Security
+
+- All donations are voluntary and non-refundable
+- Cryptocurrency addresses are verified and secure
+- No personal information is collected through donations
+- Donations support open-source development
+
+### 📊 Transparency
+
+AudioAlchemy is committed to transparent development:
+- Regular updates on project progress
+- Open-source codebase for community review
+- Clear roadmap for future features
+- Community-driven development priorities
+
+Thank you for supporting AudioAlchemy! 🙏
+
+## 🗺️ Development Roadmap
+
+*Realistic timeline for a solo developer working part-time*
+
+### Current Version (v1.0) - ✅ Complete
+- Core speech-to-text functionality
+- Multi-language translation
+- Text-to-speech with multiple providers
+- Basic voice cloning capabilities
+- User preferences and history
+- Professional web interface
+
+### Version 1.1 (Next 3-6 months)
+- 🔧 **Bug Fixes & Stability**
+  - Fix any reported issues
+  - Improve error handling
+  - Better file upload validation
+- 🔧 **Small Quality of Life Improvements**
+  - Remember user settings between sessions
+  - Better mobile responsiveness
+  - Improved audio player controls
+
+### Version 1.2 (6-12 months)
+- 📱 **Mobile Optimization**
+  - Touch-friendly interface
+  - Better mobile audio handling
+- 🔊 **Audio Enhancements**
+  - Support for more audio formats
+  - Basic audio preprocessing (noise reduction)
+  - Volume normalization
+
+### Version 1.3 (1-2 years)
+- 🤖 **AI Provider Expansion**
+  - Add support for more TTS providers
+  - Implement local Whisper for transcription
+- 💾 **Data Management**
+  - Export/import user data
+  - Better file organization
+  - Optional cloud storage integration
+
+### Future Considerations (2+ years)
+- 🌐 **API Development** (if there's demand)
+- 📊 **Analytics Dashboard** (usage tracking)
+- 🔌 **Plugin System** (for community extensions)
+
+### Maintenance Goals
+- 🛠️ **Regular Updates**: Security patches and dependency updates
+- 📚 **Documentation**: Keep README and help docs current
+- 🐛 **Issue Resolution**: Address user-reported bugs as time permits
+- 🔄 **Backup Strategy**: Ensure project continuity
+
+*Note: Timeline is flexible and depends on available development time and user feedback priorities.*
+
 ## Acknowledgments
 
 - OpenAI for Whisper and TTS APIs
 - ElevenLabs for premium voice synthesis
 - Google for Speech Recognition and Translation services
 - Flask community for the excellent web framework
+- Our generous supporters and contributors
